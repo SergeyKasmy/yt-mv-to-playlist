@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import Action from "../action.ts";
 
 function send_message_to_open_tab(payload: Action) {

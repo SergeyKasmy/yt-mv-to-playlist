@@ -1,18 +1,18 @@
 {
   "name": "youtube-move-all-to-playlist",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Move all loaded videos from the current playlist to the target playlist",
+  "author": "Sergey Kasmy",
   "license": "MIT",
   "devDependencies": {
     "@parcel/config-webextension": "^2.8.3",
-    "parcel": "^2.8.3"
+    "@types/firefox-webext-browser": "^111.0.1",
+    "@types/webextension-polyfill": "^0.10.0",
+    "parcel": "^2.8.3",
+    "webextension-polyfill": "^0.10.0"
   },
   "scripts": {
     "start": "parcel watch src/manifest.json --host localhost --config @parcel/config-webextension",
     "build": "parcel build src/manifest.json --config @parcel/config-webextension"
-  },
-  "dependencies": {
-    "@types/firefox-webext-browser": "^111.0.1"
   }
 }

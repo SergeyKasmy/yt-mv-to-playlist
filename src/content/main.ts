@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import Action from "../action.ts";
 import MoveVideos from "./move_videos.ts";
 import ScrollToEnd from "./scroll_to_end.ts";
