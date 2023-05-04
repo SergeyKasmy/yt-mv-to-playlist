@@ -2,7 +2,7 @@ import browser from "webextension-polyfill";
 import Action from "../action.ts";
 
 function send_message_to_open_tab(payload: Action) {
-	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+	browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
 		const selected_tab_id = tabs[0]?.id;
 		if (selected_tab_id == null) return;
 		browser.tabs.sendMessage(selected_tab_id, payload);
@@ -10,7 +10,11 @@ function send_message_to_open_tab(payload: Action) {
 }
 
 function move_videos() {
-	const target_playlist = (document.getElementById("target_playlist_name_input_text") as HTMLInputElement)?.value;
+	const target_playlist = (
+		document.getElementById(
+			"target_playlist_name_input_text"
+		) as HTMLInputElement
+	)?.value;
 	if (target_playlist == null) return;
 	send_message_to_open_tab({
 		action: "move_videos",

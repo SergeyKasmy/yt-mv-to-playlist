@@ -13,24 +13,29 @@ let scroll_to_end: ScrollToEnd | null = null;
 browser.runtime.onMessage.addListener((action: Action) => {
 	console.log("Received action", action);
 	switch (action.action) {
-		case "move_videos":
-		{
+		case "move_videos": {
 			console.log("Received message move_videos");
-			
+
 			// create new and start if called for the first time,
 			// toggle otherwise
 			if (move_videos == null) move_videos = new MoveVideos();
 			else move_videos.enabled = !move_videos.enabled;
 
-				
 			const current_playlist = MoveVideos.get_current_playlist();
 			console.log("current_playlist is", current_playlist);
-			console.log("Calling move_videos" + "(" + current_playlist + ", " + action.target_playlist + ")");
+			console.log(
+				"Calling move_videos" +
+					"(" +
+					current_playlist +
+					", " +
+					action.target_playlist +
+					")"
+			);
 			move_videos.move_videos(current_playlist, action.target_playlist);
 
 			break;
 		}
-		case "scroll_to_end":
+		case "scroll_to_end": {
 			// create new and start if called for the first time,
 			// toggle otherwise
 			if (scroll_to_end == null) scroll_to_end = new ScrollToEnd();
@@ -38,5 +43,6 @@ browser.runtime.onMessage.addListener((action: Action) => {
 
 			scroll_to_end.scroll_to_end();
 			break;
+		}
 	}
 });

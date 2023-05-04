@@ -1,6 +1,5 @@
-
 export default class ScrollToEnd {
-	enabled: boolean = true;
+	enabled = true;
 
 	scroll_to_end() {
 		if (!this.enabled) {
@@ -8,8 +7,13 @@ export default class ScrollToEnd {
 			return;
 		}
 		// still left to scroll
-		if (document.documentElement.scrollTop < document.documentElement.scrollHeight - document.documentElement.clientHeight) {
-			document.documentElement.scrollTop = document.documentElement.scrollHeight;
+		if (
+			document.documentElement.scrollTop <
+			document.documentElement.scrollHeight -
+				document.documentElement.clientHeight
+		) {
+			document.documentElement.scrollTop =
+				document.documentElement.scrollHeight;
 
 			setTimeout(this.scroll_to_end, 2000);
 		}
