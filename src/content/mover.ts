@@ -1,16 +1,28 @@
-function sleep(s) {
+import { Action } from "../action.ts";
+
+function sleep(s: number) {
     return new Promise(resolve => setTimeout(resolve, s * 1000 /* millis in a sec */));
 }
 
-function get_current_playlist() {
+function is_button(elem: Element): asserts elem is HTMLButtonElement {
+	if (!(elem instanceof HTMLButtonElement)) {
+		throw new Error("Button isn't an actual button??");
+	}
+}
+
+function throw_expr(msg: string): never {
+	throw new Error(msg);
+}
+
+function get_current_playlist(): string {
 	const playlist_metadata = document.getElementsByClassName("metadata-wrapper")[0];	// only one
 	const playlist_name = playlist_metadata.getElementsByClassName("yt-dynamic-sizing-formatted-string")[0].textContent;	// dunno what [1] is
 
-	return playlist_name.trim();
+	return playlist_name?.trim() ?? throw_expr("Current playlist name is null");
 }
 
 let STOPPED = true;
-async function move_videos(current_playlist, target_playlist) {
+async function move_videos(current_playlist: string, target_playlist: string) {
 	console.log("Moving from", current_playlist, "to", target_playlist);
 	if (current_playlist == "") {
 		console.error("Current playlist name is empty");
@@ -22,18 +34,20 @@ async function move_videos(current_playlist, target_playlist) {
 	}
 
 	let i = 0;
-	for (video of document.getElementsByTagName("ytd-playlist-video-renderer")) {
+	for (const video of document.getElementsByTagName("ytd-playlist-video-renderer")) {
 		if (STOPPED) {
 			console.log("Aborting early");
 			return;
 		}
 
 		console.log("Processing video #" + i);
-		video.getElementsByTagName("button").button.click();
+		video.getElementsByTagName("button")[0].click();	// only one button should exist
 		console.log("Pressed the menu button");
 		await sleep(0.2);
-		for (save_to_playlist_button of document.getElementsByTagName("tp-yt-paper-item")) {
-			if (save_to_playlist_button.textContent.indexOf("Save to playlist") == -1) {
+		for (const save_to_playlist_button of document.getElementsByTagName("tp-yt-paper-item")) {
+			is_button(save_to_playlist_button);
+
+			if (save_to_playlist_button.textContent?.indexOf("Save to playlist") == -1) {
 				continue;
 			}
 			
@@ -41,13 +55,17 @@ async function move_videos(current_playlist, target_playlist) {
 			console.log("Pressed save to playlist button");
 			await sleep(2.5);
 			
-			for (playlist of document.getElementById("playlists").getElementsByTagName("yt-formatted-string")) {
-				if (playlist.textContent == target_playlist) {
+			const playlists = document.getElementById("playlists")?.getElementsByTagName("yt-formatted-string") ?? throw_expr("Playlists not found");
+
+			for (const playlist of playlists) {
+				is_button(playlist);
+
+				if (playlist.textContent === target_playlist) {
 					playlist.click();
 					console.log("Adding to", target_playlist);
 					await sleep(0.2);
 					continue;
-				} else if (playlist.textContent == current_playlist) {
+				} else if (playlist.textContent === current_playlist) {
 					playlist.click();
 					console.log("Removing from", current_playlist);
 					await sleep(0.2);
@@ -57,7 +75,9 @@ async function move_videos(current_playlist, target_playlist) {
 			}
 		}
 		
-		document.getElementById("close-button").click();
+		const close_button = document.getElementById("close-button") ?? throw_expr("Close button not found");
+		is_button(close_button);
+		close_button.click();
 		console.log("Clicked the close save to playlist button");
 		await sleep(0.2);
 
@@ -76,9 +96,9 @@ function scroll_to_end() {
 	}
 }
 
-browser.runtime.onMessage.addListener((message) => {
-	console.log("Received message", message);
-	switch (message.action) {
+browser.runtime.onMessage.addListener((action: Action) => {
+	console.log("Received action", action);
+	switch (action.action) {
 		case "move_videos":
 		{
 			console.log("Received message move_videos");
@@ -86,8 +106,8 @@ browser.runtime.onMessage.addListener((message) => {
 			STOPPED = !STOPPED;
 			const current_playlist = get_current_playlist();
 			console.log("current_playlist is", current_playlist);
-			console.log("Calling move_videos" + "(" + current_playlist + ", " + message.target_playlist + ")");
-			move_videos(current_playlist, message.target_playlist);
+			console.log("Calling move_videos" + "(" + current_playlist + ", " + action.target_playlist + ")");
+			move_videos(current_playlist, action.target_playlist);
 
 			break;
 		}

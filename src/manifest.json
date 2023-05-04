@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/playlist*"],
-      "js": ["content/mover.js"]
+      "js": ["content/mover.ts"]
     }
   ],
   "browser_action": {
