@@ -1,4 +1,4 @@
-import { Action } from "../action.ts";
+import Action from "../action.ts";
 
 function send_message_to_open_tab(payload: Action) {
 	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
