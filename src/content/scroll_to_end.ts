@@ -1,21 +1,29 @@
+import { sleep } from "./main";
+
 export default class ScrollToEnd {
 	enabled = true;
+	private retry_count = 0;
 
-	scroll_to_end() {
-		if (!this.enabled) {
-			console.log("Stopping scrolling to end");
-			return;
-		}
-		// still left to scroll
-		if (
-			document.documentElement.scrollTop <
-			document.documentElement.scrollHeight -
-				document.documentElement.clientHeight
-		) {
-			document.documentElement.scrollTop =
-				document.documentElement.scrollHeight;
+	async scroll_to_end() {
+		// eslint-disable-next-line no-constant-condition
+		while (true) {
+			if (!this.enabled || this.retry_count > 60) {
+				console.log("Stopping scrolling to end");
+				return;
+			}
+			// still left to scroll
+			if (
+				document.documentElement.scrollTop <
+				document.documentElement.scrollHeight -
+					document.documentElement.clientHeight
+			) {
+				document.documentElement.scrollTop =
+					document.documentElement.scrollHeight;
+			} else {
+				this.retry_count += 1;
+			}
 
-			setTimeout(this.scroll_to_end, 2000);
+			await sleep(1);
 		}
 	}
 }

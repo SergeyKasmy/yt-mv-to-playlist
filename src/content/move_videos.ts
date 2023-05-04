@@ -1,10 +1,4 @@
-import { throw_expr } from "./main.ts";
-
-function sleep(s: number) {
-	return new Promise((resolve) =>
-		setTimeout(resolve, s * 1000 /* millis in a sec */)
-	);
-}
+import { sleep, throw_expr } from "./main.ts";
 
 function is_button(elem: Element): asserts elem is HTMLButtonElement {
 	if (!(elem instanceof HTMLButtonElement)) {
