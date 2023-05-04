@@ -18,7 +18,7 @@ async function move_videos(): Promise<RunningStatus | null> {
 		) as HTMLInputElement
 	)?.value;
 	if (target_playlist == null) return null;
-	
+
 	return send_message({
 		action: "move_videos",
 		target_playlist: target_playlist,
@@ -32,15 +32,23 @@ async function scroll_to_end(): Promise<RunningStatus> {
 }
 
 function update_button_running_caption(status: RunningStatus) {
-	const move_videos_button = document.getElementById("move_videos_button") ?? throw_expr("move_videos_button not found");
-	move_videos_button.textContent = status.move_videos_running ? "Stop moving videos" : "Move videos";
+	const move_videos_button =
+		document.getElementById("move_videos_button") ??
+		throw_expr("move_videos_button not found");
+	move_videos_button.textContent = status.move_videos_running
+		? "Stop moving videos"
+		: "Move videos";
 
-	const scroll_to_end_button = document.getElementById("scroll_to_end_button") ?? throw_expr("scroll_to_end_button not found");
-	scroll_to_end_button.textContent = status.scroll_to_end_running ? "Stop scrolling to end" : "Scroll to end";
+	const scroll_to_end_button =
+		document.getElementById("scroll_to_end_button") ??
+		throw_expr("scroll_to_end_button not found");
+	scroll_to_end_button.textContent = status.scroll_to_end_running
+		? "Stop scrolling to end"
+		: "Scroll to end";
 }
 
-send_message(null).then(status => update_button_running_caption(status));
-document.addEventListener("click", event => {
+send_message(null).then((status) => update_button_running_caption(status));
+document.addEventListener("click", (event) => {
 	console.log("Handling a click");
 
 	if (event.target == null || !(event.target instanceof HTMLElement)) return;
@@ -48,14 +56,14 @@ document.addEventListener("click", event => {
 	if (event.target.id === "move_videos_button") {
 		console.log("Clicked move_videos_button");
 
-		move_videos().then(status => {
+		move_videos().then((status) => {
 			if (status == null) return;
 			update_button_running_caption(status);
 		});
 	} else if (event.target.id === "scroll_to_end_button") {
 		console.log("Clicked scroll_to_end_button");
 
-		scroll_to_end().then(status => update_button_running_caption(status));
+		scroll_to_end().then((status) => update_button_running_caption(status));
 	} else {
 		console.log("Clicked something but not a button");
 	}
