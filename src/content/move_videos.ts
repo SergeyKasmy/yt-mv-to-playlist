@@ -1,4 +1,4 @@
-import { Action } from "../action.ts";
+import { throw_expr } from "./main.ts";
 
 function sleep(s: number) {
     return new Promise(resolve => setTimeout(resolve, s * 1000 /* millis in a sec */));
@@ -10,11 +10,8 @@ function is_button(elem: Element): asserts elem is HTMLButtonElement {
 	}
 }
 
-function throw_expr(msg: string): never {
-	throw new Error(msg);
-}
 
-function get_current_playlist(): string {
+export function get_current_playlist(): string {
 	const playlist_metadata = document.getElementsByClassName("metadata-wrapper")[0];	// only one
 	const playlist_name = playlist_metadata.getElementsByClassName("yt-dynamic-sizing-formatted-string")[0].textContent;	// dunno what [1] is
 
@@ -22,7 +19,16 @@ function get_current_playlist(): string {
 }
 
 let STOPPED = true;
-async function move_videos(current_playlist: string, target_playlist: string) {
+
+export function set_stopped(val: boolean) {
+	STOPPED = val;
+}
+
+export function get_stopped(): boolean {
+	return STOPPED;
+}
+
+export default async function move_videos(current_playlist: string, target_playlist: string) {
 	console.log("Moving from", current_playlist, "to", target_playlist);
 	if (current_playlist == "") {
 		console.error("Current playlist name is empty");
@@ -86,33 +92,3 @@ async function move_videos(current_playlist: string, target_playlist: string) {
 
 	alert("Done moving videos");
 }
-
-function scroll_to_end() {
-	// still left to scroll
-	if (document.documentElement.scrollTop < document.documentElement.scrollHeight - document.documentElement.clientHeight) {
-		document.documentElement.scrollTop = document.documentElement.scrollHeight;
-
-		setTimeout(scroll_to_end, 2000);
-	}
-}
-
-browser.runtime.onMessage.addListener((action: Action) => {
-	console.log("Received action", action);
-	switch (action.action) {
-		case "move_videos":
-		{
-			console.log("Received message move_videos");
-				
-			STOPPED = !STOPPED;
-			const current_playlist = get_current_playlist();
-			console.log("current_playlist is", current_playlist);
-			console.log("Calling move_videos" + "(" + current_playlist + ", " + action.target_playlist + ")");
-			move_videos(current_playlist, action.target_playlist);
-
-			break;
-		}
-		case "scroll_to_end":
-			scroll_to_end();
-			break;
-	}
-});
