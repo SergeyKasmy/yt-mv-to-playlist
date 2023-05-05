@@ -1,34 +1,73 @@
 import browser from "webextension-polyfill";
-import { Action, RunningStatus } from "../action.ts";
+import { Action, Response, RunningStatus } from "../action.ts";
 import { throw_expr } from "../utils.ts";
 
 // Send null if just to request running status
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function send_message(action: Action | null): Promise<RunningStatus> {
+async function send_message(action: Action | null): Promise<Response> {
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 
 	const selected_tab_id = tabs[0]?.id ?? throw_expr("Active tab has no ID");
-	return browser.tabs.sendMessage(selected_tab_id, action);
+	const response: Response | null = await browser.tabs.sendMessage(
+		selected_tab_id,
+		action
+	);
+
+	if (response == null) {
+		console.error("sendMessage response is null??");
+		throw new Error("sendMessage response is null??");
+	}
+
+	console.log("Received response:", response);
+
+	return response;
+}
+
+async function send_action(action: Action | null): Promise<RunningStatus> {
+	const response = await send_message(action);
+	if (response.type != "running_status")
+		throw_expr(
+			"For some reason content script hasn't returned RunningStatus for a status request??"
+		);
+	return response;
 }
 
 async function move_videos(): Promise<RunningStatus | null> {
-	const target_playlist = (
-		document.getElementById(
-			"target_playlist_name_input_text"
-		) as HTMLInputElement
-	)?.value;
-	if (target_playlist == null) return null;
+	const target_playlist_select = document.getElementById(
+		"target_playlist_select"
+	) as HTMLSelectElement | null;
 
-	return send_message({
+	if (target_playlist_select == null)
+		throw new Error("Target playlist select not found");
+
+	const target_playlist =
+		target_playlist_select.options[target_playlist_select.selectedIndex]
+			.textContent;
+
+	if (target_playlist == null || target_playlist == "") {
+		console.log("Ignoring empty target playlist name");
+		return null;
+	}
+
+	return send_action({
 		action: "move_videos",
 		target_playlist: target_playlist,
 	});
 }
 
 async function scroll_to_end(): Promise<RunningStatus> {
-	return send_message({
+	return send_action({
 		action: "scroll_to_end",
 	});
+}
+
+async function get_all_playlists(): Promise<string[]> {
+	const response = await send_message({ action: "get_playlists" });
+	if (response.type != "playlists")
+		throw_expr(
+			"For some reason content script hasn't returned playlists for a playlists request??"
+		);
+	return response.playlists;
 }
 
 function update_button_running_caption(status: RunningStatus) {
@@ -47,8 +86,8 @@ function update_button_running_caption(status: RunningStatus) {
 		: "Scroll to end";
 }
 
-send_message(null).then((status) => update_button_running_caption(status));
-document.addEventListener("click", (event) => {
+send_action(null).then((status) => update_button_running_caption(status));
+document.addEventListener("click", async (event) => {
 	console.log("Handling a click");
 
 	if (event.target == null || !(event.target instanceof HTMLElement)) return;
@@ -56,33 +95,31 @@ document.addEventListener("click", (event) => {
 	if (event.target.id === "move_videos_button") {
 		console.log("Clicked move_videos_button");
 
-		move_videos().then((status) => {
-			if (status == null) return;
-			update_button_running_caption(status);
-		});
+		const status = await move_videos();
+		if (status == null) return;
+		update_button_running_caption(status);
+	} else if (event.target.id === "get_playlists_button") {
+		// TODO: disable this button if RunningStatus == enabled
+		const playlists = await get_all_playlists();
+
+		const target_playlist_select = (document.getElementById(
+			"target_playlist_select"
+		) ?? throw_expr("target_playlist_select not found")) as HTMLSelectElement;
+
+		console.log("Received a list of playlists:", playlists.length);
+
+		for (const playlist of playlists) {
+			const option = document.createElement("option");
+			console.log("Setting value to", playlist);
+			option.textContent = playlist;
+			target_playlist_select.appendChild(option);
+		}
 	} else if (event.target.id === "scroll_to_end_button") {
 		console.log("Clicked scroll_to_end_button");
 
-		scroll_to_end().then((status) => update_button_running_caption(status));
+		const status = await scroll_to_end();
+		update_button_running_caption(status);
 	} else {
 		console.log("Clicked something but not a button");
 	}
 });
-
-/*
-function get_all_playlists() {
-	const channel = browser.runtime.connect();
-
-	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-		browser.tabs.sendMessage(tabs[0].id, { action: "get_all_playlists", channel: channel });
-	});
-
-	channel.onMessage.addListener((playlists) => {
-		for (const playlist of playlists) {
-			const playlist_elem = document.createElement("option");
-			playlist_elem.text = playlist;
-			document.getElementById("playlist_select").appendChild(playlist_elem);
-		}
-	});
-}
-*/

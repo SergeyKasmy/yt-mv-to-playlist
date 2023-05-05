@@ -1,14 +1,10 @@
-import { sleep, throw_expr } from "../utils.ts";
-
-function is_button(elem: Element): asserts elem is HTMLButtonElement {
-	if (!(elem instanceof HTMLButtonElement)) {
-		throw new Error("Button isn't an actual button??");
-	}
-}
+import { is_button, sleep, throw_expr } from "../utils.ts";
 
 export default class MoveVideos {
 	enabled = true;
 
+	// TODO: keep current and target playlists inside the MoveVideos class.
+	// This makes it easier to retrieve them to show in the popup later
 	async move_videos(current_playlist: string, target_playlist: string) {
 		console.log("Moving from", current_playlist, "to", target_playlist);
 		if (current_playlist == "") {
@@ -33,17 +29,17 @@ export default class MoveVideos {
 			video.getElementsByTagName("button")[0].click(); // only one button should exist
 			console.log("Pressed the menu button");
 			await sleep(0.2);
+
 			for (const save_to_playlist_button of document.getElementsByTagName(
 				"tp-yt-paper-item"
 			)) {
-				is_button(save_to_playlist_button);
-
 				if (
 					save_to_playlist_button.textContent?.indexOf("Save to playlist") == -1
 				) {
 					continue;
 				}
 
+				is_button(save_to_playlist_button);
 				save_to_playlist_button.click();
 				console.log("Pressed save to playlist button");
 				await sleep(2.5);
@@ -54,20 +50,35 @@ export default class MoveVideos {
 						?.getElementsByTagName("yt-formatted-string") ??
 					throw_expr("Playlists not found");
 
+				let target_playlist_elem: HTMLElement | null = null;
+				let current_playlist_elem: HTMLElement | null = null;
 				for (const playlist of playlists) {
+					if (target_playlist_elem != null && current_playlist_elem != null)
+						break;
 					is_button(playlist);
 
 					if (playlist.textContent === target_playlist) {
-						playlist.click();
-						console.log("Adding to", target_playlist);
-						await sleep(0.2);
-						continue;
+						target_playlist_elem = playlist;
 					} else if (playlist.textContent === current_playlist) {
-						playlist.click();
-						console.log("Removing from", current_playlist);
-						await sleep(0.2);
-						continue;
+						current_playlist_elem = playlist;
 					}
+				}
+
+				// both playlists found
+				if (target_playlist_elem != null && current_playlist_elem != null) {
+					target_playlist_elem.click();
+					await sleep(0.2);
+					current_playlist_elem.click();
+					await sleep(0.2);
+				} else if (target_playlist_elem == null) {
+					alert("Target playlist not found");
+					return;
+				} else if (current_playlist_elem == null) {
+					alert("Current playlist not found");
+					return;
+				} else {
+					console.error("Unreachable");
+					return;
 				}
 			}
 
