@@ -1,4 +1,4 @@
-import { sleep } from "./main";
+import { sleep } from "../utils.ts";
 
 export default class ScrollToEnd {
 	enabled = true;

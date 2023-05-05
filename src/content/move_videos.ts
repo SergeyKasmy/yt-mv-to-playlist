@@ -1,4 +1,4 @@
-import { sleep, throw_expr } from "./main.ts";
+import { sleep, throw_expr } from "../utils.ts";
 
 function is_button(elem: Element): asserts elem is HTMLButtonElement {
 	if (!(elem instanceof HTMLButtonElement)) {

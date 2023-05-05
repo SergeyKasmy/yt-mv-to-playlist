@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill";
 import { Action, RunningStatus } from "../action.ts";
-import { throw_expr } from "../content/main.ts";
+import { throw_expr } from "../utils.ts";
 
 // Send null if just to request running status
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
