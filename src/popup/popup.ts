@@ -1,5 +1,10 @@
 import browser from "webextension-polyfill";
-import { Action, Response, RunningStatus } from "../action.ts";
+import {
+	Action,
+	Response as Response,
+	RunningStatus,
+	isResponse,
+} from "../communication.ts";
 import { throw_expr } from "../utils.ts";
 
 // Send null if just to request running status
@@ -8,14 +13,26 @@ async function send_message(action: Action | null): Promise<Response> {
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 
 	const selected_tab_id = tabs[0]?.id ?? throw_expr("Active tab has no ID");
-	const response: Response | null = await browser.tabs.sendMessage(
+	const response: unknown = await browser.tabs.sendMessage(
 		selected_tab_id,
 		action
 	);
 
-	if (response == null) {
-		console.error("sendMessage response is null??");
-		throw new Error("sendMessage response is null??");
+	if (!isResponse(response)) {
+		let response_str = "";
+		if (
+			typeof response === "object" &&
+			response != null &&
+			typeof response.toString === "function"
+		) {
+			response_str = ": " + response.toString();
+		} else if (response == null) {
+			response_str = ": null";
+		}
+
+		throw new Error(
+			"sendMessage response isn't of type Response" + response_str
+		);
 	}
 
 	console.log("Received response:", response);
@@ -25,8 +42,8 @@ async function send_message(action: Action | null): Promise<Response> {
 
 async function send_action(action: Action | null): Promise<RunningStatus> {
 	const response = await send_message(action);
-	if (response.type != "running_status")
-		throw_expr(
+	if (response.response_type != "running_status")
+		throw new Error(
 			"For some reason content script hasn't returned RunningStatus for a status request??"
 		);
 	return response;
@@ -63,7 +80,7 @@ async function scroll_to_end(): Promise<RunningStatus> {
 
 async function get_all_playlists(): Promise<string[]> {
 	const response = await send_message({ action: "get_playlists" });
-	if (response.type != "playlists")
+	if (response.response_type != "playlists")
 		throw_expr(
 			"For some reason content script hasn't returned playlists for a playlists request??"
 		);

@@ -15,12 +15,16 @@ export type ActionGetPlaylists = {
 };
 
 export type RunningStatus = {
-	type: "running_status";
+	response_type: "running_status";
 	move_videos_running: boolean;
 	scroll_to_end_running: boolean;
 };
 
 export type Playlists = {
-	type: "playlists";
+	response_type: "playlists";
 	playlists: string[];
 };
+
+export function isResponse(x: unknown): x is Response {
+	return typeof x === "object" && x != null && "response_type" in x;
+}
