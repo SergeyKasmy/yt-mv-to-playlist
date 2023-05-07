@@ -1,11 +1,11 @@
-import { assertIsButton, sleep, throwExpr } from "../utils.ts";
+import { sleep, throwExpr } from "../utils.ts";
 
 export default class MoveVideos {
 	enabled = true;
 
 	// TODO: keep current and target playlists inside the MoveVideos class.
 	// This makes it easier to retrieve them to show in the popup later
-	async moveBideos(currentPlaylist: string, targetPlaylist: string) {
+	async moveVideos(currentPlaylist: string, targetPlaylist: string) {
 		console.log("Moving from", currentPlaylist, "to", targetPlaylist);
 		if (currentPlaylist == "") {
 			console.error("Current playlist name is empty");
@@ -19,7 +19,7 @@ export default class MoveVideos {
 		let i = 0;
 		for (const video of document.getElementsByTagName(
 			"ytd-playlist-video-renderer"
-		)) {
+		) as HTMLCollectionOf<HTMLElement>) {
 			if (!this.enabled) {
 				console.log("Aborting early");
 				return;
@@ -32,14 +32,13 @@ export default class MoveVideos {
 
 			for (const saveToPlaylistButton of document.getElementsByTagName(
 				"tp-yt-paper-item"
-			)) {
+			) as HTMLCollectionOf<HTMLElement>) {
 				if (
 					saveToPlaylistButton.textContent?.indexOf("Save to playlist") == -1
 				) {
 					continue;
 				}
 
-				assertIsButton(saveToPlaylistButton);
 				saveToPlaylistButton.click();
 				console.log("Pressed save to playlist button");
 				await sleep(2.5);
@@ -47,7 +46,7 @@ export default class MoveVideos {
 				const playlists =
 					document
 						.getElementById("playlists")
-						?.getElementsByTagName("yt-formatted-string") ??
+						?.getElementsByTagName("yt-formatted-string") as HTMLCollectionOf<HTMLElement> ??
 					throwExpr("Playlists not found");
 
 				let targetPlaylistElem: HTMLElement | null = null;
@@ -57,7 +56,6 @@ export default class MoveVideos {
 						break;
 					}
 
-					assertIsButton(playlist);
 
 					if (playlist.textContent === targetPlaylist) {
 						targetPlaylistElem = playlist;
@@ -87,7 +85,6 @@ export default class MoveVideos {
 			const closeButton =
 				document.getElementById("close-button") ??
 				throwExpr("Close button not found");
-			assertIsButton(closeButton);
 			closeButton.click();
 			console.log("Clicked the close save to playlist button");
 			await sleep(0.2);

@@ -7,9 +7,3 @@ export function sleep(s: number) {
 export function throwExpr(msg: string): never {
 	throw new Error(msg);
 }
-
-export function assertIsButton(elem: Element): asserts elem is HTMLButtonElement {
-	if (!(elem instanceof HTMLElement)) {
-		throw new Error("Element isn't pressible");
-	}
-}

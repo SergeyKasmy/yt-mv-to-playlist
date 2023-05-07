@@ -28,10 +28,10 @@ browser.runtime.onMessage.addListener(
 							"(" +
 							current_playlist +
 							", " +
-							action.target_playlist +
+							action.targetPlaylist +
 							")"
 					);
-					moveVideos.moveVideos(current_playlist, action.target_playlist);
+					moveVideos.moveVideos(current_playlist, action.targetPlaylist);
 					break;
 				}
 				case "scroll_to_end": {
@@ -47,7 +47,7 @@ browser.runtime.onMessage.addListener(
 					const playlists = await getPlaylists();
 
 					const response: Response = {
-						response_type: "playlists",
+						responseType: "playlists",
 						playlists: playlists,
 					};
 
@@ -58,9 +58,9 @@ browser.runtime.onMessage.addListener(
 		}
 
 		const response: Response = {
-			response_type: "running_status",
-			move_videos_running: moveVideos?.enabled ?? false,
-			scroll_to_end_running: scrollToEnd?.enabled ?? false,
+			responseType: "running_status",
+			moveVideosRunning: moveVideos?.enabled ?? false,
+			scrollToEndRunning: scrollToEnd?.enabled ?? false,
 		};
 
 		console.log("Responding with:", response);

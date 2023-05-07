@@ -1,4 +1,4 @@
-import { assertIsButton, sleep, throwExpr } from "../utils";
+import { sleep, throwExpr } from "../utils";
 
 export default async function getPlaylists(): Promise<string[]> {
 	const video = document.getElementsByTagName("ytd-playlist-video-renderer")[0];
@@ -11,7 +11,7 @@ export default async function getPlaylists(): Promise<string[]> {
 
 	for (const saveToPlaylistButton of document.getElementsByTagName(
 		"tp-yt-paper-item"
-	)) {
+	) as HTMLCollectionOf<HTMLElement>) {
 		const saveToPlaylistButtonText = saveToPlaylistButton.textContent;
 		if (
 			saveToPlaylistButtonText == null ||
@@ -23,7 +23,6 @@ export default async function getPlaylists(): Promise<string[]> {
 
 		console.log("FOUND:", saveToPlaylistButton);
 
-		assertIsButton(saveToPlaylistButton);
 		saveToPlaylistButton.click();
 		console.log("Pressed save to playlist button");
 		await sleep(2.5);
@@ -50,7 +49,6 @@ export default async function getPlaylists(): Promise<string[]> {
 		document.getElementById("close-button") ??
 		throwExpr("Close button not found");
 
-	assertIsButton(closeButton);
 	closeButton.click();
 	console.log("Clicked the close save to playlist button");
 
