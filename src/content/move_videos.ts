@@ -1,17 +1,17 @@
-import { is_button, sleep, throw_expr } from "../utils.ts";
+import { assertIsButton, sleep, throwExpr } from "../utils.ts";
 
 export default class MoveVideos {
 	enabled = true;
 
 	// TODO: keep current and target playlists inside the MoveVideos class.
 	// This makes it easier to retrieve them to show in the popup later
-	async move_videos(current_playlist: string, target_playlist: string) {
-		console.log("Moving from", current_playlist, "to", target_playlist);
-		if (current_playlist == "") {
+	async moveBideos(currentPlaylist: string, targetPlaylist: string) {
+		console.log("Moving from", currentPlaylist, "to", targetPlaylist);
+		if (currentPlaylist == "") {
 			console.error("Current playlist name is empty");
 			return;
 		}
-		if (target_playlist == "") {
+		if (targetPlaylist == "") {
 			alert("Target playlist name is empty");
 			return;
 		}
@@ -30,17 +30,17 @@ export default class MoveVideos {
 			console.log("Pressed the menu button");
 			await sleep(0.2);
 
-			for (const save_to_playlist_button of document.getElementsByTagName(
+			for (const saveToPlaylistButton of document.getElementsByTagName(
 				"tp-yt-paper-item"
 			)) {
 				if (
-					save_to_playlist_button.textContent?.indexOf("Save to playlist") == -1
+					saveToPlaylistButton.textContent?.indexOf("Save to playlist") == -1
 				) {
 					continue;
 				}
 
-				is_button(save_to_playlist_button);
-				save_to_playlist_button.click();
+				assertIsButton(saveToPlaylistButton);
+				saveToPlaylistButton.click();
 				console.log("Pressed save to playlist button");
 				await sleep(2.5);
 
@@ -48,32 +48,34 @@ export default class MoveVideos {
 					document
 						.getElementById("playlists")
 						?.getElementsByTagName("yt-formatted-string") ??
-					throw_expr("Playlists not found");
+					throwExpr("Playlists not found");
 
-				let target_playlist_elem: HTMLElement | null = null;
-				let current_playlist_elem: HTMLElement | null = null;
+				let targetPlaylistElem: HTMLElement | null = null;
+				let currentPlaylistElem: HTMLElement | null = null;
 				for (const playlist of playlists) {
-					if (target_playlist_elem != null && current_playlist_elem != null)
+					if (targetPlaylistElem != null && currentPlaylistElem != null) {
 						break;
-					is_button(playlist);
+					}
 
-					if (playlist.textContent === target_playlist) {
-						target_playlist_elem = playlist;
-					} else if (playlist.textContent === current_playlist) {
-						current_playlist_elem = playlist;
+					assertIsButton(playlist);
+
+					if (playlist.textContent === targetPlaylist) {
+						targetPlaylistElem = playlist;
+					} else if (playlist.textContent === currentPlaylist) {
+						currentPlaylistElem = playlist;
 					}
 				}
 
 				// both playlists found
-				if (target_playlist_elem != null && current_playlist_elem != null) {
-					target_playlist_elem.click();
+				if (targetPlaylistElem != null && currentPlaylistElem != null) {
+					targetPlaylistElem.click();
 					await sleep(0.2);
-					current_playlist_elem.click();
+					currentPlaylistElem.click();
 					await sleep(0.2);
-				} else if (target_playlist_elem == null) {
+				} else if (targetPlaylistElem == null) {
 					alert("Target playlist not found");
 					return;
-				} else if (current_playlist_elem == null) {
+				} else if (currentPlaylistElem == null) {
 					alert("Current playlist not found");
 					return;
 				} else {
@@ -82,11 +84,11 @@ export default class MoveVideos {
 				}
 			}
 
-			const close_button =
+			const closeButton =
 				document.getElementById("close-button") ??
-				throw_expr("Close button not found");
-			is_button(close_button);
-			close_button.click();
+				throwExpr("Close button not found");
+			assertIsButton(closeButton);
+			closeButton.click();
 			console.log("Clicked the close save to playlist button");
 			await sleep(0.2);
 
@@ -96,13 +98,13 @@ export default class MoveVideos {
 		alert("Done moving videos");
 	}
 
-	static get_current_playlist(): string {
-		const playlist_metadata =
+	static getCurrentPlaylist(): string {
+		const playlistMetadata =
 			document.getElementsByClassName("metadata-wrapper")[0]; // only one
-		const playlist_name = playlist_metadata.getElementsByClassName(
+		const playlistName = playlistMetadata.getElementsByClassName(
 			"yt-dynamic-sizing-formatted-string"
 		)[0].textContent; // dunno what [1] is
 
-		return playlist_name?.trim() ?? throw_expr("Current playlist name is null");
+		return playlistName?.trim() ?? throwExpr("Current playlist name is null");
 	}
 }

@@ -2,10 +2,10 @@ import browser from "webextension-polyfill";
 import { Action, Response } from "../communication.ts";
 import MoveVideos from "./move_videos.ts";
 import ScrollToEnd from "./scroll_to_end.ts";
-import get_playlists from "./get_playlists.ts";
+import getPlaylists from "./get_playlists.ts";
 
-let move_videos: MoveVideos | null = null;
-let scroll_to_end: ScrollToEnd | null = null;
+let moveVideos: MoveVideos | null = null;
+let scrollToEnd: ScrollToEnd | null = null;
 
 browser.runtime.onMessage.addListener(
 	// SAFETY: action is always either Action or null
@@ -18,10 +18,10 @@ browser.runtime.onMessage.addListener(
 
 					// create new and start if called for the first time,
 					// toggle otherwise
-					if (move_videos == null) move_videos = new MoveVideos();
-					else move_videos.enabled = !move_videos.enabled;
+					if (moveVideos == null) moveVideos = new MoveVideos();
+					else moveVideos.enabled = !moveVideos.enabled;
 
-					const current_playlist = MoveVideos.get_current_playlist();
+					const current_playlist = MoveVideos.getCurrentPlaylist();
 					console.log("current_playlist is", current_playlist);
 					console.log(
 						"Calling move_videos" +
@@ -31,20 +31,20 @@ browser.runtime.onMessage.addListener(
 							action.target_playlist +
 							")"
 					);
-					move_videos.move_videos(current_playlist, action.target_playlist);
+					moveVideos.moveVideos(current_playlist, action.target_playlist);
 					break;
 				}
 				case "scroll_to_end": {
 					// create new and start if called for the first time,
 					// toggle otherwise
-					if (scroll_to_end == null) scroll_to_end = new ScrollToEnd();
-					else scroll_to_end.enabled = !scroll_to_end.enabled;
+					if (scrollToEnd == null) scrollToEnd = new ScrollToEnd();
+					else scrollToEnd.enabled = !scrollToEnd.enabled;
 
-					scroll_to_end.scroll_to_end();
+					scrollToEnd.scrollToEnd();
 					break;
 				}
 				case "get_playlists": {
-					const playlists = await get_playlists();
+					const playlists = await getPlaylists();
 
 					const response: Response = {
 						response_type: "playlists",
@@ -59,8 +59,8 @@ browser.runtime.onMessage.addListener(
 
 		const response: Response = {
 			response_type: "running_status",
-			move_videos_running: move_videos?.enabled ?? false,
-			scroll_to_end_running: scroll_to_end?.enabled ?? false,
+			move_videos_running: moveVideos?.enabled ?? false,
+			scroll_to_end_running: scrollToEnd?.enabled ?? false,
 		};
 
 		console.log("Responding with:", response);

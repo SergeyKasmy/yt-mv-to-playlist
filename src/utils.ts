@@ -4,12 +4,12 @@ export function sleep(s: number) {
 	);
 }
 
-export function throw_expr(msg: string): never {
+export function throwExpr(msg: string): never {
 	throw new Error(msg);
 }
 
-export function is_button(elem: Element): asserts elem is HTMLButtonElement {
+export function assertIsButton(elem: Element): asserts elem is HTMLButtonElement {
 	if (!(elem instanceof HTMLElement)) {
-		throw new Error("Button isn't an actual button??");
+		throw new Error("Element isn't pressible");
 	}
 }

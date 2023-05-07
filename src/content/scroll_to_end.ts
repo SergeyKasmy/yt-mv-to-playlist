@@ -2,12 +2,12 @@ import { sleep } from "../utils.ts";
 
 export default class ScrollToEnd {
 	enabled = true;
-	private retry_count = 0;
+	private retryCount = 0;
 
-	async scroll_to_end() {
+	async scrollToEnd() {
 		// eslint-disable-next-line no-constant-condition
 		while (true) {
-			if (!this.enabled || this.retry_count > 60) {
+			if (!this.enabled || this.retryCount > 60) {
 				console.log("Stopping scrolling to end");
 				return;
 			}
@@ -20,7 +20,7 @@ export default class ScrollToEnd {
 				document.documentElement.scrollTop =
 					document.documentElement.scrollHeight;
 			} else {
-				this.retry_count += 1;
+				this.retryCount += 1;
 			}
 
 			await sleep(1);

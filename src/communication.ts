@@ -3,7 +3,7 @@ export type Response = RunningStatus | Playlists;
 
 export type ActionMoveVideos = {
 	action: "move_videos";
-	target_playlist: string;
+	targetPlaylist: string;
 };
 
 export type ActionScrollToEnd = {
@@ -15,13 +15,13 @@ export type ActionGetPlaylists = {
 };
 
 export type RunningStatus = {
-	response_type: "running_status";
-	move_videos_running: boolean;
-	scroll_to_end_running: boolean;
+	responseType: "running_status";
+	moveVideosRunning: boolean;
+	scrollToEndRunning: boolean;
 };
 
 export type Playlists = {
-	response_type: "playlists";
+	responseType: "playlists";
 	playlists: string[];
 };
 

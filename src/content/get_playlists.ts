@@ -1,6 +1,6 @@
-import { is_button, sleep, throw_expr } from "../utils";
+import { assertIsButton, sleep, throwExpr } from "../utils";
 
-export default async function get_playlists(): Promise<string[]> {
+export default async function getPlaylists(): Promise<string[]> {
 	const video = document.getElementsByTagName("ytd-playlist-video-renderer")[0];
 
 	video.getElementsByTagName("button")[0].click(); // only one button should exist
@@ -9,22 +9,22 @@ export default async function get_playlists(): Promise<string[]> {
 
 	let playlists: string[] = [];
 
-	for (const save_to_playlist_button of document.getElementsByTagName(
+	for (const saveToPlaylistButton of document.getElementsByTagName(
 		"tp-yt-paper-item"
 	)) {
-		const save_to_playlist_button_text = save_to_playlist_button.textContent;
+		const saveToPlaylistButtonText = saveToPlaylistButton.textContent;
 		if (
-			save_to_playlist_button_text == null ||
-			save_to_playlist_button_text.indexOf("Save to playlist") == -1
+			saveToPlaylistButtonText == null ||
+			saveToPlaylistButtonText.indexOf("Save to playlist") == -1
 		) {
 			console.log("Skipping");
 			continue;
 		}
 
-		console.log("FOUND:", save_to_playlist_button);
+		console.log("FOUND:", saveToPlaylistButton);
 
-		is_button(save_to_playlist_button);
-		save_to_playlist_button.click();
+		assertIsButton(saveToPlaylistButton);
+		saveToPlaylistButton.click();
 		console.log("Pressed save to playlist button");
 		await sleep(2.5);
 
@@ -32,7 +32,7 @@ export default async function get_playlists(): Promise<string[]> {
 			document
 				.getElementById("playlists")
 				?.getElementsByTagName("yt-formatted-string") ??
-			throw_expr("Playlists not found");
+			throwExpr("Playlists not found");
 
 		playlists = Array.from(playlists_html_collection)
 			.map((playlist_elem) => {
@@ -46,12 +46,12 @@ export default async function get_playlists(): Promise<string[]> {
 		break;
 	}
 
-	const close_button =
+	const closeButton =
 		document.getElementById("close-button") ??
-		throw_expr("Close button not found");
+		throwExpr("Close button not found");
 
-	is_button(close_button);
-	close_button.click();
+	assertIsButton(closeButton);
+	closeButton.click();
 	console.log("Clicked the close save to playlist button");
 
 	return playlists;

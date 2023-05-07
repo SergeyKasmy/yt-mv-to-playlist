@@ -4,9 +4,6 @@ devDependencies:
   '@parcel/config-webextension':
     specifier: ^2.8.3
     version: 2.8.3(@parcel/core@2.8.3)
-  '@types/firefox-webext-browser':
-    specifier: ^111.0.1
-    version: 111.0.1
   '@types/webextension-polyfill':
     specifier: ^0.10.0
     version: 0.10.0
@@ -1007,10 +1004,6 @@ packages:
   /@trysound/sax@0.2.0:
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
-    dev: true
-
-  /@types/firefox-webext-browser@111.0.1:
-    resolution: {integrity: sha512-mmHWdQTCT68X0hh0URrsIyWhJeFzZHaiprj6nni/CmsAmqYq27T0eZyu1ePeKJ/zuDD3wqtTzm5TwRFAso+oPw==}
     dev: true
 
   /@types/json-schema@7.0.11:
