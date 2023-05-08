@@ -1,7 +1,7 @@
 {
-  "name": "youtube-move-all-to-playlist",
-  "version": "0.0.1",
-  "description": "Move all loaded videos from the current playlist to the target playlist",
+  "name": "yt-mv-to-playlist",
+  "version": "0.1.0",
+  "description": "Move all loaded videos from the current playlist to the target playlist. Completely client-sided and doesn't use Youtube API",
   "author": "Sergey Kasmy",
   "license": "MIT",
   "devDependencies": {
