@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import {
 	Action,
-	Response as Response,
+	Response,
 	RunningStatus,
 	isResponse,
 } from "../communication.ts";
@@ -13,6 +13,7 @@ async function sendMessage(action: Action | null): Promise<Response> {
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 
 	const selectedTabId = tabs[0]?.id ?? throwExpr("Active tab has no ID");
+	// FIXME: throws "could not establish connection receiving end doesn't exist" if the content script isn't loaded
 	const response: unknown = await browser.tabs.sendMessage(
 		selectedTabId,
 		action
@@ -61,14 +62,14 @@ async function moveVideos(): Promise<RunningStatus | null> {
 		targetPlaylistSelect.options[targetPlaylistSelect.selectedIndex]
 			.textContent;
 
-	if (targetPlaylist == null || targetPlaylist == "") {
+	if (targetPlaylist == null || targetPlaylist === "") {
 		console.log("Ignoring empty target playlist name");
 		return null;
 	}
 
 	return sendAction({
 		action: "move_videos",
-		targetPlaylist: targetPlaylist,
+		targetPlaylist,
 	});
 }
 

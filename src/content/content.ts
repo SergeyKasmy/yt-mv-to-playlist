@@ -48,7 +48,7 @@ browser.runtime.onMessage.addListener(
 
 					const response: Response = {
 						responseType: "playlists",
-						playlists: playlists,
+						playlists,
 					};
 
 					console.log("Responding with:", response);

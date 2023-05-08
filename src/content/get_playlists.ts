@@ -39,7 +39,7 @@ export default async function getPlaylists(): Promise<string[]> {
 			})
 			.filter((playlist_name) => {
 				return playlist_name != null && playlist_name != "";
-			}) as string[];
+			}) as string[];	// just filtered out null, should never be null
 
 		console.log("Playlists:", playlists);
 		break;

@@ -51,11 +51,11 @@ export default class MoveVideos {
 
 				let targetPlaylistElem: HTMLElement | null = null;
 				let currentPlaylistElem: HTMLElement | null = null;
+
 				for (const playlist of playlists) {
 					if (targetPlaylistElem != null && currentPlaylistElem != null) {
 						break;
 					}
-
 
 					if (playlist.textContent === targetPlaylist) {
 						targetPlaylistElem = playlist;
