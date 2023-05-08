@@ -1,0 +1,11 @@
+body {
+	min-width: 175px;
+	margin: 0;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+.input {
+	margin: 5px;
+}
