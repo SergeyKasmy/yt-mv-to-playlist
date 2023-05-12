@@ -1,48 +1,55 @@
-export type Action = ActionMoveVideos | ActionScrollToEnd | ActionGetPlaylists;
+export type Action = ActionStatus | ActionMoveVideos | ActionScrollToEnd | ActionGetPlaylists;
+
+export type ActionStatus = {
+	action: "get_status",
+};
 
 export type ActionMoveVideos = ActionMoveVideosStart | ActionMoveVideosEnd;
 
 export type ActionMoveVideosStart = {
-	action: "move_videos";
-	run: "start"
-	targetPlaylist: string;
+	action: "move_videos",
+	run: "start",
+	targetPlaylist: string,
 };
 
 export type ActionMoveVideosEnd = {
-	action: "move_videos";
+	action: "move_videos",
 	run: "stop"
 };
 
 export type ActionScrollToEnd = {
-	action: "scroll_to_end";
+	action: "scroll_to_end",
 	run: "start" | "stop",
 };
 
 export type ActionGetPlaylists = {
-	action: "get_playlists";
+	action: "get_playlists",
 };
 
 // ------------------------------------
 
-export type Response = IsRunning | IsMoveRunning | IsScrollRunning | Playlists;
+export type Response = Status | IsMoveRunning | IsScrollRunning | Playlists;
 
-export type IsRunning = {
-	responseType: "is_running"
-} & Omit<IsMoveRunning, "responseType"> & Omit<IsScrollRunning, "responseType">;
+export type Status = {
+	responseType: "status",
+	isMoveRunning: boolean,
+	isScrollRunning: boolean,
+	playlists: string[] | null
+};
 
 export type IsMoveRunning = {
-	responseType: "is_move_running";
-	isMoveRunning: boolean;
+	responseType: "is_move_running",
+	isMoveRunning: boolean,
 };
 
 export type IsScrollRunning = {
-	responseType: "is_scroll_running";
-	isScrollRunning: boolean;
+	responseType: "is_scroll_running",
+	isScrollRunning: boolean,
 };
 
 export type Playlists = {
-	responseType: "playlists";
-	playlists: string[];
+	responseType: "playlists",
+	playlists: string[],
 };
 
 export function isResponse(x: unknown): x is Response {

@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 
 // Send null if just to request running status
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function sendMessage(action: Action | null): Promise<Response> {
+async function sendMessage(action: Action): Promise<Response> {
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 
 	const selectedTabId = tabs[0]?.id ?? throwExpr("Active tab has no ID");
@@ -37,19 +37,23 @@ export default function Popup() {
 
 	useEffect(() => {
 		(async () => {
-			console.log("Getting running status");
+			console.log("Getting status");
 
-			const currentRunningStatus = await sendMessage(null);
-			console.log("currentRunningStatus:", currentRunningStatus);
+			const status = await sendMessage({ action: "get_status" });
+			console.log("status:", status);
 
-			if ("isMoveRunning" in currentRunningStatus && "isScrollRunning" in currentRunningStatus) {
-				console.log("Setting isMoveRunning to", currentRunningStatus.isMoveRunning);
-				console.log("Setting isScrollRunning to", currentRunningStatus.isScrollRunning);
+			if ("isMoveRunning" in status && "isScrollRunning" in status && "playlists" in status) {
+				console.log("Setting isMoveRunning to", status.isMoveRunning);
+				console.log("Setting isScrollRunning to", status.isScrollRunning);
+				console.log("Setting targetPlaylists to", status.playlists);
 
-				setIsMoveRunning(currentRunningStatus.isMoveRunning);
-				setIsScrollRunning(currentRunningStatus.isScrollRunning);
+				setIsMoveRunning(status.isMoveRunning);
+				setIsScrollRunning(status.isScrollRunning);
+				if (status.playlists != null) {
+					setTargetPlaylists(status.playlists);
+				}
 			} else {
-				throwWrongTypeError("currentRunningStatus", currentRunningStatus, "IsRunning");
+				throwWrongTypeError("status", status, "IsRunning");
 			}
 
 		})();
@@ -147,13 +151,16 @@ function GetPlaylistsButton({ setTargetPlaylists }: { setTargetPlaylists: (targe
 	console.log("Rerendering GetPlaylistsButton");
 
 	async function handleClick() {
-		const response = await sendMessage({ action: "get_playlists" });
+		const response = await sendMessage({
+			action: "get_playlists",
+		});
+
 		if (response.responseType != "playlists")
 			throwExpr(
 				"For some reason content script hasn't returned playlists for a playlists request??"
 			);
 		
-		setTargetPlaylists(response.playlists);
+		setTargetPlaylists(response?.playlists ?? throwWrongTypeError("playlists", response?.playlists, "string[]"));
 	}
 
 	return (

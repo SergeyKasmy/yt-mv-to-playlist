@@ -1,29 +1,30 @@
 import browser from "webextension-polyfill";
-import { Action, Response } from "../communication.ts";
+import { Action, IsMoveRunning, IsScrollRunning, Playlists, Response, Status } from "../communication.ts";
 import MoveVideos from "./move_videos.ts";
 import ScrollToEnd from "./scroll_to_end.ts";
 import getPlaylists from "./get_playlists.ts";
 
 let moveVideos: MoveVideos | null = null;
 let scrollToEnd: ScrollToEnd | null = null;
+let playlists: string[] | null = null;
 
 browser.runtime.onMessage.addListener(
-	// SAFETY: action is always either Action or null
-	async (action: Action | null): Promise<Response> => {
+	async (action: Action): Promise<Response> => {
 		console.log("Received action", action);
-		if (action == null) {
-			const response: Response = {
-				responseType: "is_running",
-				isMoveRunning: moveVideos?.enabled ?? false,
-				isScrollRunning: scrollToEnd?.enabled ?? false,
-			};
-
-			console.log("Responding with:", response);
-
-			return Promise.resolve(response);
-		}
 
 		switch (action.action) {
+			case "get_status": {
+				const response: Status = {
+					responseType: "status",
+					isMoveRunning: moveVideos?.enabled ?? false,
+					isScrollRunning: scrollToEnd?.enabled ?? false,
+					playlists,
+				};
+
+				console.log("Responding with:", response);
+
+				return Promise.resolve(response);
+			}
 			case "move_videos": {
 				console.log("Received message move_videos");
 
@@ -45,7 +46,7 @@ browser.runtime.onMessage.addListener(
 					moveVideos.enabled = false;
 				}
 
-				const response: Response = {
+				const response: IsMoveRunning = {
 					responseType: "is_move_running",
 					isMoveRunning: moveVideos?.enabled ?? false,
 				};
@@ -66,7 +67,7 @@ browser.runtime.onMessage.addListener(
 					scrollToEnd.enabled = false;
 				}
 
-				const response: Response = {
+				const response: IsScrollRunning = {
 					responseType: "is_scroll_running",
 					isScrollRunning: scrollToEnd?.enabled ?? false,
 				};
@@ -76,9 +77,9 @@ browser.runtime.onMessage.addListener(
 				return Promise.resolve(response);
 			}
 			case "get_playlists": {
-				const playlists = await getPlaylists();
+				playlists = await getPlaylists();
 
-				const response: Response = {
+				const response: Playlists = {
 					responseType: "playlists",
 					playlists,
 				};
@@ -87,6 +88,5 @@ browser.runtime.onMessage.addListener(
 				return Promise.resolve(response);
 			}
 		}
-
 	}
 );
