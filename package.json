@@ -4,22 +4,33 @@
   "description": "Move all loaded videos from the current playlist to the target playlist. Completely client-sided and doesn't use Youtube API",
   "author": "Sergey Kasmy",
   "license": "MIT",
+  "type": "module",
   "devDependencies": {
     "@parcel/config-webextension": "^2.8.3",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
     "eslint": "^8.39.0",
     "parcel": "^2.8.3",
+    "process": "^0.11.10",
     "webextension-polyfill": "^0.10.0"
+  },
+  "devDependenciesComments": {
+	  "process": "Needed for parcel watch react support"
   },
   "scripts": {
     "start": "parcel watch src/manifest.json --host localhost --config @parcel/config-webextension",
     "build": "parcel build src/manifest.json --config @parcel/config-webextension",
-	"format": "prettier -w src/",
-	"lint": "fd . src/ -e .ts -X eslint"
+    "format": "prettier -w src/",
+    "lint": "fd . src/ -e .ts -X eslint"
   },
   "prettier": {
-	  "useTabs": true
+    "useTabs": true
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

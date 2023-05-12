@@ -26,5 +26,5 @@ export type Playlists = {
 };
 
 export function isResponse(x: unknown): x is Response {
-	return typeof x === "object" && x != null && "response_type" in x;
+	return typeof x === "object" && x != null && "responseType" in x;
 }
