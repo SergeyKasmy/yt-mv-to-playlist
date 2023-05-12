@@ -2,6 +2,7 @@ import { sleep, throwExpr } from "../utils.ts";
 
 export default class MoveVideos {
 	enabled = true;
+	current_video_idx = 0;
 
 	// TODO: keep current and target playlists inside the MoveVideos class.
 	// This makes it easier to retrieve them to show in the popup later
@@ -25,7 +26,13 @@ export default class MoveVideos {
 				return;
 			}
 
-			console.log("Processing video #" + i);
+			if (i < this.current_video_idx) {
+				console.log("Skipping already moved video #", i);
+				i += 1;
+				continue;
+			}
+
+			console.log("Processing video #" + this.current_video_idx);
 			video.getElementsByTagName("button")[0].click(); // only one button should exist
 			console.log("Pressed the menu button");
 			await sleep(0.2);
@@ -89,9 +96,11 @@ export default class MoveVideos {
 			console.log("Clicked the close save to playlist button");
 			await sleep(0.2);
 
+			this.current_video_idx += 1;
 			i += 1;
 		}
 
+		this.enabled = false;
 		alert("Done moving videos");
 	}
 
