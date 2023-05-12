@@ -1,14 +1,16 @@
 import browser from "webextension-polyfill";
+import { JSX } from "preact";
+import { useState, useEffect } from "preact/hooks";
+
 import { Action, Response, isResponse } from "../communication.ts";
 import { throwExpr, throwWrongTypeError } from "../utils.ts";
-import { useState, useEffect } from "react";
 
 // Send null if just to request running status
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function sendMessage(action: Action): Promise<Response> {
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 
-	const selectedTabId = tabs[0]?.id ?? throwExpr("Active tab has no ID");
+	const selectedTabId = tabs.at(0)?.id ?? throwExpr("Active tab has no ID");
 	// FIXME: throws "could not establish connection receiving end doesn't exist" if the content script isn't loaded
 	const response: unknown = await browser.tabs.sendMessage(
 		selectedTabId,
@@ -99,7 +101,7 @@ function TargetPlaylistSelect({
 }: TargetPlaylistSelectProps) {
 	console.log("Rerendering TargetPlaylistSelect");
 
-	function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
+	function handleChange(event: JSX.TargetedEvent<HTMLSelectElement>) {
 		const targetPlaylist =
 			event.currentTarget.options[event.currentTarget.selectedIndex]
 				.textContent;
@@ -111,7 +113,7 @@ function TargetPlaylistSelect({
 	}
 
 	return (
-		<select className="input" onChange={handleChange}>
+		<select className="input" onInput={handleChange}>
 			{playlists.map((playlist) => (
 				<option key={playlist}>{playlist}</option>
 			))}
