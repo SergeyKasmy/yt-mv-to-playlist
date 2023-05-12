@@ -1,9 +1,5 @@
 import browser from "webextension-polyfill";
-import {
-	Action,
-	Response,
-	isResponse,
-} from "../communication.ts";
+import { Action, Response, isResponse } from "../communication.ts";
 import { throwExpr, throwWrongTypeError } from "../utils.ts";
 import { useState, useEffect } from "react";
 
@@ -34,7 +30,6 @@ export default function Popup() {
 	const [isMoveRunning, setIsMoveRunning] = useState(false);
 	const [isScrollRunning, setIsScrollRunning] = useState(false);
 
-
 	useEffect(() => {
 		(async () => {
 			console.log("Getting status");
@@ -42,7 +37,11 @@ export default function Popup() {
 			const status = await sendMessage({ action: "get_status" });
 			console.log("status:", status);
 
-			if ("isMoveRunning" in status && "isScrollRunning" in status && "playlists" in status) {
+			if (
+				"isMoveRunning" in status &&
+				"isScrollRunning" in status &&
+				"playlists" in status
+			) {
 				console.log("Setting isMoveRunning to", status.isMoveRunning);
 				console.log("Setting isScrollRunning to", status.isScrollRunning);
 				console.log("Setting targetPlaylists to", status.playlists);
@@ -55,7 +54,6 @@ export default function Popup() {
 			} else {
 				throwWrongTypeError("status", status, "IsRunning");
 			}
-
 		})();
 	}, []);
 
@@ -72,20 +70,33 @@ export default function Popup() {
 
 	return (
 		<>
-			<TargetPlaylistSelect playlists={targetPlaylists} setTargetPlaylist={setTargetPlaylist}/>
-			<MoveVideosButton isRunning={isMoveRunning} setIsRunning={setIsMoveRunning} targetPlaylist={targetPlaylist} />
+			<TargetPlaylistSelect
+				playlists={targetPlaylists}
+				setTargetPlaylist={setTargetPlaylist}
+			/>
+			<MoveVideosButton
+				isRunning={isMoveRunning}
+				setIsRunning={setIsMoveRunning}
+				targetPlaylist={targetPlaylist}
+			/>
 			<GetPlaylistsButton setTargetPlaylists={setTargetPlaylists} />
-			<ScrollToEndButton isRunning={isScrollRunning} setIsRunning={setIsScrollRunning} />
+			<ScrollToEndButton
+				isRunning={isScrollRunning}
+				setIsRunning={setIsScrollRunning}
+			/>
 		</>
 	);
 }
 
 type TargetPlaylistSelectProps = {
-	playlists: string[],
-	setTargetPlaylist: (playlist: string) => void,
+	playlists: string[];
+	setTargetPlaylist: (playlist: string) => void;
 };
 
-function TargetPlaylistSelect({ playlists, setTargetPlaylist }: TargetPlaylistSelectProps) {
+function TargetPlaylistSelect({
+	playlists,
+	setTargetPlaylist,
+}: TargetPlaylistSelectProps) {
 	console.log("Rerendering TargetPlaylistSelect");
 
 	function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -101,18 +112,24 @@ function TargetPlaylistSelect({ playlists, setTargetPlaylist }: TargetPlaylistSe
 
 	return (
 		<select className="input" onChange={handleChange}>
-			{playlists.map(playlist => <option key={playlist}>{playlist}</option>)}
+			{playlists.map((playlist) => (
+				<option key={playlist}>{playlist}</option>
+			))}
 		</select>
 	);
 }
 
 type MoveVideosButtonProps = {
-	targetPlaylist: string | null,
-	isRunning: boolean,
-	setIsRunning: (isRunning: boolean) => void,
+	targetPlaylist: string | null;
+	isRunning: boolean;
+	setIsRunning: (isRunning: boolean) => void;
 };
 
-function MoveVideosButton({ targetPlaylist, isRunning, setIsRunning }: MoveVideosButtonProps) {
+function MoveVideosButton({
+	targetPlaylist,
+	isRunning,
+	setIsRunning,
+}: MoveVideosButtonProps) {
 	console.log("Rerendering MoveVideosButton");
 
 	async function handleClick() {
@@ -120,7 +137,7 @@ function MoveVideosButton({ targetPlaylist, isRunning, setIsRunning }: MoveVideo
 		if (isRunning) {
 			status = await sendMessage({
 				action: "move_videos",
-				run: "stop"
+				run: "stop",
 			});
 		} else if (targetPlaylist != null && targetPlaylist !== "") {
 			status = await sendMessage({
@@ -129,7 +146,7 @@ function MoveVideosButton({ targetPlaylist, isRunning, setIsRunning }: MoveVideo
 				targetPlaylist,
 			});
 		} else {
-			console.log("Ignoring empty target playlist name");	// but only if we ~want~ to start
+			console.log("Ignoring empty target playlist name"); // but only if we ~want~ to start
 			return null;
 		}
 
@@ -143,11 +160,17 @@ function MoveVideosButton({ targetPlaylist, isRunning, setIsRunning }: MoveVideo
 	const caption = isRunning ? "Stop moving videos" : "Move videos";
 
 	return (
-		<button className="input" onClick={handleClick}>{caption}</button>
+		<button className="input" onClick={handleClick}>
+			{caption}
+		</button>
 	);
 }
 
-function GetPlaylistsButton({ setTargetPlaylists }: { setTargetPlaylists: (targetPlaylists: string[]) => void }) {
+function GetPlaylistsButton({
+	setTargetPlaylists,
+}: {
+	setTargetPlaylists: (targetPlaylists: string[]) => void;
+}) {
 	console.log("Rerendering GetPlaylistsButton");
 
 	async function handleClick() {
@@ -159,21 +182,29 @@ function GetPlaylistsButton({ setTargetPlaylists }: { setTargetPlaylists: (targe
 			throwExpr(
 				"For some reason content script hasn't returned playlists for a playlists request??"
 			);
-		
-		setTargetPlaylists(response?.playlists ?? throwWrongTypeError("playlists", response?.playlists, "string[]"));
+
+		setTargetPlaylists(
+			response?.playlists ??
+				throwWrongTypeError("playlists", response?.playlists, "string[]")
+		);
 	}
 
 	return (
-		<button className="input" onClick={handleClick}>Get playlists</button>
+		<button className="input" onClick={handleClick}>
+			Get playlists
+		</button>
 	);
 }
 
 type ScrollToEndButtonProps = {
-	isRunning: boolean,
-	setIsRunning: (isRunning: boolean) => void,
+	isRunning: boolean;
+	setIsRunning: (isRunning: boolean) => void;
 };
 
-function ScrollToEndButton({ isRunning, setIsRunning }: ScrollToEndButtonProps) {
+function ScrollToEndButton({
+	isRunning,
+	setIsRunning,
+}: ScrollToEndButtonProps) {
 	console.log("Rerendering ScrollToEndButton");
 
 	async function handleClick() {
@@ -192,6 +223,8 @@ function ScrollToEndButton({ isRunning, setIsRunning }: ScrollToEndButtonProps) 
 	const caption = isRunning ? "Stop scrolling" : "Scroll to end";
 
 	return (
-		<button className="input" onClick={handleClick}>{caption}</button>
+		<button className="input" onClick={handleClick}>
+			{caption}
+		</button>
 	);
 }

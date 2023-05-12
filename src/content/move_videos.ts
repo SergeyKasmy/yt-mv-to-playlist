@@ -51,9 +51,11 @@ export default class MoveVideos {
 				await sleep(2.5);
 
 				const playlists =
-					document
+					(document
 						.getElementById("playlists")
-						?.getElementsByTagName("yt-formatted-string") as HTMLCollectionOf<HTMLElement> ??
+						?.getElementsByTagName(
+							"yt-formatted-string"
+						) as HTMLCollectionOf<HTMLElement>) ??
 					throwExpr("Playlists not found");
 
 				let targetPlaylistElem: HTMLElement | null = null;

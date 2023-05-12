@@ -1,5 +1,12 @@
 import browser from "webextension-polyfill";
-import { Action, IsMoveRunning, IsScrollRunning, Playlists, Response, Status } from "../communication.ts";
+import {
+	Action,
+	IsMoveRunning,
+	IsScrollRunning,
+	Playlists,
+	Response,
+	Status,
+} from "../communication.ts";
 import MoveVideos from "./move_videos.ts";
 import ScrollToEnd from "./scroll_to_end.ts";
 import getPlaylists from "./get_playlists.ts";
