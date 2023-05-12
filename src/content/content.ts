@@ -11,60 +11,82 @@ browser.runtime.onMessage.addListener(
 	// SAFETY: action is always either Action or null
 	async (action: Action | null): Promise<Response> => {
 		console.log("Received action", action);
-		if (action != null) {
-			switch (action.action) {
-				case "move_videos": {
-					console.log("Received message move_videos");
+		if (action == null) {
+			const response: Response = {
+				responseType: "is_running",
+				isMoveRunning: moveVideos?.enabled ?? false,
+				isScrollRunning: scrollToEnd?.enabled ?? false,
+			};
 
-					// create new and start if called for the first time,
-					// toggle otherwise
-					if (moveVideos == null) moveVideos = new MoveVideos();
-					else moveVideos.enabled = !moveVideos.enabled;
+			console.log("Responding with:", response);
 
+			return Promise.resolve(response);
+		}
+
+		switch (action.action) {
+			case "move_videos": {
+				console.log("Received message move_videos");
+
+				// create new and start if called for the first time,
+				// toggle otherwise
+				if (moveVideos == null) moveVideos = new MoveVideos();
+
+				if (action.run == "start") {
+					moveVideos.enabled = true;
 					const current_playlist = MoveVideos.getCurrentPlaylist();
+
 					console.log("current_playlist is", current_playlist);
 					console.log(
-						"Calling move_videos" +
-							"(" +
-							current_playlist +
-							", " +
-							action.targetPlaylist +
-							")"
+						`Calling move_videos(${current_playlist}, ${action.targetPlaylist})`
 					);
+
 					moveVideos.moveVideos(current_playlist, action.targetPlaylist);
-					break;
+				} else {
+					moveVideos.enabled = false;
 				}
-				case "scroll_to_end": {
-					// create new and start if called for the first time,
-					// toggle otherwise
-					if (scrollToEnd == null) scrollToEnd = new ScrollToEnd();
-					else scrollToEnd.enabled = !scrollToEnd.enabled;
 
+				const response: Response = {
+					responseType: "is_move_running",
+					isMoveRunning: moveVideos?.enabled ?? false,
+				};
+
+				console.log("Responding with:", response);
+
+				return Promise.resolve(response);
+			}
+			case "scroll_to_end": {
+				// create new and start if called for the first time,
+				// toggle otherwise
+				if (scrollToEnd == null) scrollToEnd = new ScrollToEnd();
+
+				if (action.run == "start") {
+					scrollToEnd.enabled = true;
 					scrollToEnd.scrollToEnd();
-					break;
+				} else {
+					scrollToEnd.enabled = false;
 				}
-				case "get_playlists": {
-					const playlists = await getPlaylists();
 
-					const response: Response = {
-						responseType: "playlists",
-						playlists,
-					};
+				const response: Response = {
+					responseType: "is_scroll_running",
+					isScrollRunning: scrollToEnd?.enabled ?? false,
+				};
 
-					console.log("Responding with:", response);
-					return Promise.resolve(response);
-				}
+				console.log("Responding with:", response);
+
+				return Promise.resolve(response);
+			}
+			case "get_playlists": {
+				const playlists = await getPlaylists();
+
+				const response: Response = {
+					responseType: "playlists",
+					playlists,
+				};
+
+				console.log("Responding with:", response);
+				return Promise.resolve(response);
 			}
 		}
 
-		const response: Response = {
-			responseType: "running_status",
-			moveVideosRunning: moveVideos?.enabled ?? false,
-			scrollToEndRunning: scrollToEnd?.enabled ?? false,
-		};
-
-		console.log("Responding with:", response);
-
-		return Promise.resolve(response);
 	}
 );

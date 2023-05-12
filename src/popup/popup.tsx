@@ -2,10 +2,9 @@ import browser from "webextension-polyfill";
 import {
 	Action,
 	Response,
-	RunningStatus,
 	isResponse,
 } from "../communication.ts";
-import { throwExpr } from "../utils.ts";
+import { throwExpr, throwWrongTypeError } from "../utils.ts";
 import { useState, useEffect } from "react";
 
 // Send null if just to request running status
@@ -21,32 +20,11 @@ async function sendMessage(action: Action | null): Promise<Response> {
 	);
 
 	if (!isResponse(response)) {
-		let responseStr = "";
-		if (
-			typeof response === "object" &&
-			response != null
-		) {
-			responseStr = ": " + JSON.stringify(response);
-		} else if (response == null) {
-			responseStr = ": null";
-		}
-
-		throw new Error(
-			"sendMessage response isn't of type Response" + responseStr
-		);
+		throwWrongTypeError("response", response, "Response");
 	}
 
 	console.log("Received response:", response);
 
-	return response;
-}
-
-async function sendAction(action: Action | null): Promise<RunningStatus> {
-	const response = await sendMessage(action);
-	if (response.responseType != "running_status")
-		throw new Error(
-			"For some reason content script hasn't returned RunningStatus for a status request??"
-		);
 	return response;
 }
 
@@ -61,11 +39,19 @@ export default function Popup() {
 		(async () => {
 			console.log("Getting running status");
 
-			const currentRunningStatus = await sendAction(null);
+			const currentRunningStatus = await sendMessage(null);
 			console.log("currentRunningStatus:", currentRunningStatus);
 
-			setIsMoveRunning(currentRunningStatus.moveVideosRunning);
-			setIsScrollRunning(currentRunningStatus.scrollToEndRunning);
+			if ("isMoveRunning" in currentRunningStatus && "isScrollRunning" in currentRunningStatus) {
+				console.log("Setting isMoveRunning to", currentRunningStatus.isMoveRunning);
+				console.log("Setting isScrollRunning to", currentRunningStatus.isScrollRunning);
+
+				setIsMoveRunning(currentRunningStatus.isMoveRunning);
+				setIsScrollRunning(currentRunningStatus.isScrollRunning);
+			} else {
+				throwWrongTypeError("currentRunningStatus", currentRunningStatus, "IsRunning");
+			}
+
 		})();
 	}, []);
 
@@ -126,17 +112,28 @@ function MoveVideosButton({ targetPlaylist, isRunning, setIsRunning }: MoveVideo
 	console.log("Rerendering MoveVideosButton");
 
 	async function handleClick() {
-		if (targetPlaylist == null || targetPlaylist === "") {
-			console.log("Ignoring empty target playlist name");
+		let status;
+		if (isRunning) {
+			status = await sendMessage({
+				action: "move_videos",
+				run: "stop"
+			});
+		} else if (targetPlaylist != null && targetPlaylist !== "") {
+			status = await sendMessage({
+				action: "move_videos",
+				run: "start",
+				targetPlaylist,
+			});
+		} else {
+			console.log("Ignoring empty target playlist name");	// but only if we ~want~ to start
 			return null;
 		}
 
-		const runningStatus = await sendAction({
-			action: "move_videos",
-			targetPlaylist,
-		});
+		if (!("isMoveRunning" in status)) {
+			throwWrongTypeError("status", status, "isMoveRunning");
+		}
 
-		setIsRunning(runningStatus.moveVideosRunning);
+		setIsRunning(status.isMoveRunning);
 	}
 
 	const caption = isRunning ? "Stop moving videos" : "Move videos";
@@ -173,11 +170,16 @@ function ScrollToEndButton({ isRunning, setIsRunning }: ScrollToEndButtonProps) 
 	console.log("Rerendering ScrollToEndButton");
 
 	async function handleClick() {
-		const status = await sendAction({
-			action: "scroll_to_end"
+		const status = await sendMessage({
+			action: "scroll_to_end",
+			run: isRunning ? "stop" : "start",
 		});
 
-		setIsRunning(status.scrollToEndRunning);
+		if (!("isScrollRunning" in status)) {
+			throwWrongTypeError("status", status, "IsScrollRunning");
+		}
+
+		setIsRunning(status.isScrollRunning);
 	}
 
 	const caption = isRunning ? "Stop scrolling" : "Scroll to end";

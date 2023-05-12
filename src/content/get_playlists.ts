@@ -1,4 +1,4 @@
-import { sleep, throwExpr } from "../utils";
+import { sleep, throwExpr } from "../utils.ts";
 
 export default async function getPlaylists(): Promise<string[]> {
 	const video = document.getElementsByTagName("ytd-playlist-video-renderer")[0];
