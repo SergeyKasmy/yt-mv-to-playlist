@@ -1,13 +1,31 @@
+:root {
+    background-color: rgb(28, 27, 34);
+	border: 1px solid;
+	border-color: darkgray;
+	border-radius: 10px;
+}
+
 #root {
-	width: 200px;
-	margin: 0;
-	padding: 10px;
-	display: flex;
-	flex-direction: column;
+    width: 200px;
+    flex-direction: column;
+    margin: 0;
+    padding: 10px;
+    display: flex;
 }
 
 button,
 input,
 select {
-	margin: 5px;
+    margin: 5px;
+	padding: 5px;
+    background-color: rgb(72, 72, 84);
+    color: #eee;
+	border: none;
+    border-radius: 2px;
+}
+
+button:hover,
+input:hover,
+select:hover {
+	background-color: rgb(92, 92, 106);
 }
