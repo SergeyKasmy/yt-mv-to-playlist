@@ -164,17 +164,29 @@ function MoveVideosButton({
 		setIsRunning(status.isMoveRunning);
 	}
 
-	function handleVideosToMoveInputChange(e: JSX.TargetedEvent<HTMLInputElement>) {
+	function handleVideosToMoveInputChange(
+		e: JSX.TargetedEvent<HTMLInputElement>
+	) {
 		console.log("Setting videosToMove to:", e.currentTarget.valueAsNumber);
-		setVideosToMove(isNaN(e.currentTarget.valueAsNumber) ? "all" : e.currentTarget.valueAsNumber);
+		setVideosToMove(
+			isNaN(e.currentTarget.valueAsNumber)
+				? "all"
+				: e.currentTarget.valueAsNumber
+		);
 	}
 
 	const caption = isRunning ? "Stop moving videos" : "Move videos";
 
 	return (
 		<div style={{ display: "flex" }}>
-			<button style={{ flexGrow: 1 }} onClick={handleClick}>{caption}</button>
-			<input type="number" style={{ width: "30px", height: "fit-content" }} onChange={handleVideosToMoveInputChange} />
+			<button style={{ flexGrow: 1 }} onClick={handleClick}>
+				{caption}
+			</button>
+			<input
+				type="number"
+				style={{ width: "30px", height: "fit-content" }}
+				onChange={handleVideosToMoveInputChange}
+			/>
 		</div>
 	);
 }
@@ -202,11 +214,7 @@ function GetPlaylistsButton({
 		);
 	}
 
-	return (
-		<button onClick={handleClick}>
-			Get playlists
-		</button>
-	);
+	return <button onClick={handleClick}>Get playlists</button>;
 }
 
 type ScrollToEndButtonProps = {
@@ -235,9 +243,5 @@ function ScrollToEndButton({
 
 	const caption = isRunning ? "Stop scrolling" : "Scroll to end";
 
-	return (
-		<button onClick={handleClick}>
-			{caption}
-		</button>
-	);
+	return <button onClick={handleClick}>{caption}</button>;
 }

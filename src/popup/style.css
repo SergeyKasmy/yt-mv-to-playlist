@@ -6,6 +6,8 @@
 	flex-direction: column;
 }
 
-button, input, select {
+button,
+input,
+select {
 	margin: 5px;
 }

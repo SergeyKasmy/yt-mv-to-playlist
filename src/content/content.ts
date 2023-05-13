@@ -48,7 +48,11 @@ browser.runtime.onMessage.addListener(
 						`Calling move_videos(${current_playlist}, ${action.targetPlaylist}, ${action.videosToMove})`
 					);
 
-					moveVideos.moveVideos(current_playlist, action.targetPlaylist, action.videosToMove);
+					moveVideos.moveVideos(
+						current_playlist,
+						action.targetPlaylist,
+						action.videosToMove
+					);
 				} else {
 					moveVideos.running = false;
 				}

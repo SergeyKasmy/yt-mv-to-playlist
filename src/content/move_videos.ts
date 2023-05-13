@@ -6,7 +6,11 @@ export default class MoveVideos {
 
 	// TODO: keep current and target playlists inside the MoveVideos class.
 	// This makes it easier to retrieve them to show in the popup later
-	async moveVideos(currentPlaylist: string, targetPlaylist: string, videosToMove: "all" | number) {
+	async moveVideos(
+		currentPlaylist: string,
+		targetPlaylist: string,
+		videosToMove: "all" | number
+	) {
 		console.log("Moving from", currentPlaylist, "to", targetPlaylist);
 		if (currentPlaylist == "") {
 			console.error("Current playlist name is empty");
