@@ -1,8 +1,8 @@
 import { sleep, throwExpr } from "../utils.ts";
 
 export default class MoveVideos {
-	enabled = true;
-	current_video_idx = 0;
+	running = true;
+	private current_video_idx = 0;
 
 	// TODO: keep current and target playlists inside the MoveVideos class.
 	// This makes it easier to retrieve them to show in the popup later
@@ -22,13 +22,14 @@ export default class MoveVideos {
 		for (const video of document.getElementsByTagName(
 			"ytd-playlist-video-renderer"
 		) as HTMLCollectionOf<HTMLElement>) {
-			if (!this.enabled) {
+			if (!this.running) {
 				console.log("Moving videos disabled");
 				return;
 			}
 
 			if (videosToMove !== "all" && videosMoved >= videosToMove) {
 				alert(`Done moving ${videosMoved} videos`);
+				this.running = false;
 				return;
 			}
 
@@ -115,7 +116,7 @@ export default class MoveVideos {
 			videosMoved += 1;
 		}
 
-		this.enabled = false;
+		this.running = false;
 		alert(`Done moving ${MoveVideos} videos`);
 	}
 

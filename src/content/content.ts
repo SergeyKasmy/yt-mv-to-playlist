@@ -23,8 +23,8 @@ browser.runtime.onMessage.addListener(
 			case "get_status": {
 				const response: Status = {
 					responseType: "status",
-					isMoveRunning: moveVideos?.enabled ?? false,
-					isScrollRunning: scrollToEnd?.enabled ?? false,
+					isMoveRunning: moveVideos?.running ?? false,
+					isScrollRunning: scrollToEnd?.running ?? false,
 					playlists,
 				};
 
@@ -40,7 +40,7 @@ browser.runtime.onMessage.addListener(
 				if (moveVideos == null) moveVideos = new MoveVideos();
 
 				if (action.run == "start") {
-					moveVideos.enabled = true;
+					moveVideos.running = true;
 					const current_playlist = MoveVideos.getCurrentPlaylist();
 
 					console.log("current_playlist is", current_playlist);
@@ -50,12 +50,12 @@ browser.runtime.onMessage.addListener(
 
 					moveVideos.moveVideos(current_playlist, action.targetPlaylist, action.videosToMove);
 				} else {
-					moveVideos.enabled = false;
+					moveVideos.running = false;
 				}
 
 				const response: IsMoveRunning = {
 					responseType: "is_move_running",
-					isMoveRunning: moveVideos?.enabled ?? false,
+					isMoveRunning: moveVideos?.running ?? false,
 				};
 
 				console.log("Responding with:", response);
@@ -68,15 +68,15 @@ browser.runtime.onMessage.addListener(
 				if (scrollToEnd == null) scrollToEnd = new ScrollToEnd();
 
 				if (action.run == "start") {
-					scrollToEnd.enabled = true;
+					scrollToEnd.running = true;
 					scrollToEnd.scrollToEnd();
 				} else {
-					scrollToEnd.enabled = false;
+					scrollToEnd.running = false;
 				}
 
 				const response: IsScrollRunning = {
 					responseType: "is_scroll_running",
-					isScrollRunning: scrollToEnd?.enabled ?? false,
+					isScrollRunning: scrollToEnd?.running ?? false,
 				};
 
 				console.log("Responding with:", response);
