@@ -45,10 +45,10 @@ browser.runtime.onMessage.addListener(
 
 					console.log("current_playlist is", current_playlist);
 					console.log(
-						`Calling move_videos(${current_playlist}, ${action.targetPlaylist})`
+						`Calling move_videos(${current_playlist}, ${action.targetPlaylist}, ${action.videosToMove})`
 					);
 
-					moveVideos.moveVideos(current_playlist, action.targetPlaylist);
+					moveVideos.moveVideos(current_playlist, action.targetPlaylist, action.videosToMove);
 				} else {
 					moveVideos.enabled = false;
 				}

@@ -14,6 +14,7 @@ export type ActionMoveVideosStart = {
 	action: "move_videos";
 	run: "start";
 	targetPlaylist: string;
+	videosToMove: "all" | number;
 };
 
 export type ActionMoveVideosEnd = {

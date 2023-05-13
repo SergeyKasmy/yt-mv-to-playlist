@@ -18,6 +18,9 @@
   "devDependenciesComments": {
     "process": "Needed for parcel watch react support"
   },
+  "dependencies": {
+    "preact": "^10.13.2"
+  },
   "scripts": {
     "start": "parcel watch src/manifest.json --host localhost --config @parcel/config-webextension",
     "build": "parcel build src/manifest.json --config @parcel/config-webextension",
@@ -27,7 +30,7 @@
   "prettier": {
     "useTabs": true
   },
-  "dependencies": {
-    "preact": "^10.13.2"
+  "alias": {
+	  "preact/jsx-dev-runtime": "preact/jsx-runtime"
   }
 }

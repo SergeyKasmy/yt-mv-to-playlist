@@ -6,29 +6,35 @@ export default class MoveVideos {
 
 	// TODO: keep current and target playlists inside the MoveVideos class.
 	// This makes it easier to retrieve them to show in the popup later
-	async moveVideos(currentPlaylist: string, targetPlaylist: string) {
+	async moveVideos(currentPlaylist: string, targetPlaylist: string, videosToMove: "all" | number) {
 		console.log("Moving from", currentPlaylist, "to", targetPlaylist);
 		if (currentPlaylist == "") {
 			console.error("Current playlist name is empty");
 			return;
 		}
 		if (targetPlaylist == "") {
-			alert("Target playlist name is empty");
+			console.error("Target playlist name is empty");
 			return;
 		}
 
-		let i = 0;
+		let currVideoIdx = 0;
+		let videosMoved = 0;
 		for (const video of document.getElementsByTagName(
 			"ytd-playlist-video-renderer"
 		) as HTMLCollectionOf<HTMLElement>) {
 			if (!this.enabled) {
-				console.log("Aborting early");
+				console.log("Moving videos disabled");
 				return;
 			}
 
-			if (i < this.current_video_idx) {
-				console.log("Skipping already moved video #", i);
-				i += 1;
+			if (videosToMove !== "all" && videosMoved >= videosToMove) {
+				alert(`Done moving ${videosMoved} videos`);
+				return;
+			}
+
+			if (currVideoIdx < this.current_video_idx) {
+				console.log("Skipping already moved video #", currVideoIdx);
+				currVideoIdx += 1;
 				continue;
 			}
 
@@ -105,11 +111,12 @@ export default class MoveVideos {
 			await sleep(0.2);
 
 			this.current_video_idx += 1;
-			i += 1;
+			currVideoIdx += 1;
+			videosMoved += 1;
 		}
 
 		this.enabled = false;
-		alert("Done moving videos");
+		alert(`Done moving ${MoveVideos} videos`);
 	}
 
 	static getCurrentPlaylist(): string {

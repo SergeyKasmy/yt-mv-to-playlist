@@ -81,11 +81,13 @@ export default function Popup() {
 				setIsRunning={setIsMoveRunning}
 				targetPlaylist={targetPlaylist}
 			/>
-			<GetPlaylistsButton setTargetPlaylists={setTargetPlaylists} />
-			<ScrollToEndButton
-				isRunning={isScrollRunning}
-				setIsRunning={setIsScrollRunning}
-			/>
+			<div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+				<GetPlaylistsButton setTargetPlaylists={setTargetPlaylists} />
+				<ScrollToEndButton
+					isRunning={isScrollRunning}
+					setIsRunning={setIsScrollRunning}
+				/>
+			</div>
 		</>
 	);
 }
@@ -113,7 +115,7 @@ function TargetPlaylistSelect({
 	}
 
 	return (
-		<select className="input" onInput={handleChange}>
+		<select onInput={handleChange}>
 			{playlists.map((playlist) => (
 				<option key={playlist}>{playlist}</option>
 			))}
@@ -134,6 +136,8 @@ function MoveVideosButton({
 }: MoveVideosButtonProps) {
 	console.log("Rerendering MoveVideosButton");
 
+	const [videosToMove, setVideosToMove] = useState<"all" | number>("all");
+
 	async function handleClick() {
 		let status;
 		if (isRunning) {
@@ -146,9 +150,10 @@ function MoveVideosButton({
 				action: "move_videos",
 				run: "start",
 				targetPlaylist,
+				videosToMove: videosToMove == null ? "all" : videosToMove,
 			});
 		} else {
-			console.log("Ignoring empty target playlist name"); // but only if we ~want~ to start
+			console.error("Ignoring empty target playlist name"); // but only if we ~want~ to start
 			return null;
 		}
 
@@ -159,12 +164,18 @@ function MoveVideosButton({
 		setIsRunning(status.isMoveRunning);
 	}
 
+	function handleVideosToMoveInputChange(e: JSX.TargetedEvent<HTMLInputElement>) {
+		console.log("Setting videosToMove to:", e.currentTarget.valueAsNumber);
+		setVideosToMove(isNaN(e.currentTarget.valueAsNumber) ? "all" : e.currentTarget.valueAsNumber);
+	}
+
 	const caption = isRunning ? "Stop moving videos" : "Move videos";
 
 	return (
-		<button className="input" onClick={handleClick}>
-			{caption}
-		</button>
+		<div style={{ display: "flex" }}>
+			<button style={{ flexGrow: 1 }} onClick={handleClick}>{caption}</button>
+			<input type="number" style={{ width: "30px", height: "fit-content" }} onChange={handleVideosToMoveInputChange} />
+		</div>
 	);
 }
 
@@ -192,7 +203,7 @@ function GetPlaylistsButton({
 	}
 
 	return (
-		<button className="input" onClick={handleClick}>
+		<button onClick={handleClick}>
 			Get playlists
 		</button>
 	);
@@ -225,7 +236,7 @@ function ScrollToEndButton({
 	const caption = isRunning ? "Stop scrolling" : "Scroll to end";
 
 	return (
-		<button className="input" onClick={handleClick}>
+		<button onClick={handleClick}>
 			{caption}
 		</button>
 	);

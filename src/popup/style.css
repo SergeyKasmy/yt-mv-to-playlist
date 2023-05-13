@@ -1,11 +1,11 @@
 #root {
-	min-width: 175px;
+	width: 200px;
 	margin: 0;
 	padding: 10px;
 	display: flex;
 	flex-direction: column;
 }
 
-.input {
+button, input, select {
 	margin: 5px;
 }
