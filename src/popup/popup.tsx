@@ -214,7 +214,11 @@ function GetPlaylistsButton({
 		);
 	}
 
-	return <button style={{ flexGrow: 1 }} onClick={handleClick}>Get playlists</button>;
+	return (
+		<button style={{ flexGrow: 1 }} onClick={handleClick}>
+			Get playlists
+		</button>
+	);
 }
 
 type ScrollToEndButtonProps = {
@@ -243,5 +247,9 @@ function ScrollToEndButton({
 
 	const caption = isRunning ? "Stop scrolling" : "Scroll to end";
 
-	return <button style={{ flexGrow: 1 }} onClick={handleClick}>{caption}</button>;
+	return (
+		<button style={{ flexGrow: 1 }} onClick={handleClick}>
+			{caption}
+		</button>
+	);
 }
