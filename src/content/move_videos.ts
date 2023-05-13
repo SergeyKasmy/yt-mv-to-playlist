@@ -54,31 +54,37 @@ export default class MoveVideos {
 					(document
 						.getElementById("playlists")
 						?.getElementsByTagName(
-							"yt-formatted-string"
-						) as HTMLCollectionOf<HTMLElement>) ??
+							"tp-yt-paper-checkbox"
+						) as HTMLCollectionOf<HTMLInputElement>) ??
 					throwExpr("Playlists not found");
 
-				let targetPlaylistElem: HTMLElement | null = null;
-				let currentPlaylistElem: HTMLElement | null = null;
+				let targetPlaylistElem: HTMLInputElement | null = null;
+				let currentPlaylistElem: HTMLInputElement | null = null;
 
 				for (const playlist of playlists) {
 					if (targetPlaylistElem != null && currentPlaylistElem != null) {
 						break;
 					}
 
-					if (playlist.textContent === targetPlaylist) {
+					if (playlist.textContent?.trim() === targetPlaylist) {
 						targetPlaylistElem = playlist;
-					} else if (playlist.textContent === currentPlaylist) {
+					} else if (playlist.textContent?.trim() === currentPlaylist) {
 						currentPlaylistElem = playlist;
 					}
 				}
 
 				// both playlists found
 				if (targetPlaylistElem != null && currentPlaylistElem != null) {
-					targetPlaylistElem.click();
-					await sleep(0.2);
-					currentPlaylistElem.click();
-					await sleep(0.2);
+					// add to target playlist if not already there
+					if (targetPlaylistElem.ariaChecked === "false") {
+						targetPlaylistElem.click();
+						await sleep(0.2);
+					}
+
+					if (currentPlaylistElem.ariaChecked === "true") {
+						currentPlaylistElem.click();
+						await sleep(0.2);
+					}
 				} else if (targetPlaylistElem == null) {
 					alert("Target playlist not found");
 					return;
